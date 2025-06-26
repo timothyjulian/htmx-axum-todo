@@ -1,0 +1,6 @@
+[package]
+name = "htmx-axum-todo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
