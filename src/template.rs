@@ -5,6 +5,15 @@ use axum::{http::StatusCode, response::{Html, IntoResponse}};
 #[template(path="index.html")]
 pub struct IndexTemplate{}
 
+use crate::todo::Todo;
+
+#[derive(Template)]
+#[template(path = "todos.html")]
+pub struct TodosTemplate{
+    // all fields passed in template can be used by jinja
+    pub todos: Vec<Todo>,
+}
+
 pub struct HtmlTemplate<T>(pub T);
 
 impl <T> IntoResponse for HtmlTemplate<T> where T: Template {
