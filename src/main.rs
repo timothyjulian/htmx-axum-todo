@@ -1,18 +1,18 @@
-mod todo;
 mod template;
+mod todo;
 
-use axum::extract::{Path};
 use axum::Form;
-use axum::response::{IntoResponse,};
+use axum::extract::Path;
+use axum::response::IntoResponse;
 use axum::routing::{delete, get};
-use tokio::net::TcpListener;
-use todo::{Todo, TodoForm};
 use template::{HtmlTemplate, IndexTemplate, TodosTemplate};
+use todo::{Todo, TodoForm};
+use tokio::net::TcpListener;
 
 const TODO_FILE_PATH: &str = "./src/todos.json";
 
 #[tokio::main]
-async fn main() -> std::io::Result<()>{
+async fn main() -> std::io::Result<()> {
     let app = axum::Router::new()
         .route("/", get(index))
         .route("/todo", get(get_todos).post(create_todo))
@@ -35,7 +35,9 @@ async fn read_todos() -> Vec<Todo> {
 
 //get todos handler
 async fn get_todos() -> impl IntoResponse {
-    let template = TodosTemplate { todos: read_todos().await};
+    let template = TodosTemplate {
+        todos: read_todos().await,
+    };
     HtmlTemplate(template)
 }
 
@@ -44,13 +46,11 @@ async fn index() -> impl IntoResponse {
 }
 
 //delete todo handler
-async fn delete_todo(
-    Path(id): Path<u32>
-) -> impl IntoResponse {
+async fn delete_todo(Path(id): Path<u32>) -> impl IntoResponse {
     let mut todos = read_todos().await;
     // removes todo matching id from the routes path
     todos.retain(|todo| todo.id != id as usize);
-    
+
     let file = std::fs::OpenOptions::new()
         .write(true)
         .truncate(true)
@@ -60,12 +60,10 @@ async fn delete_todo(
     //writes over json with updated todo list
     serde_json::to_writer(file, &todos).unwrap();
 
-    HtmlTemplate(TodosTemplate { todos  })
+    HtmlTemplate(TodosTemplate { todos })
 }
 
-pub async fn create_todo(
-    form: Form<TodoForm>
-)  -> impl IntoResponse {
+pub async fn create_todo(form: Form<TodoForm>) -> impl IntoResponse {
     let mut todos = read_todos().await;
 
     //create an id for our todos, a random or uuid would be better
